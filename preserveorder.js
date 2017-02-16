@@ -2,7 +2,8 @@
  * preserveorder.js
  *
  *   To Run:
- *     $ npm install && node preserveorder.js
+ *     $ npm install
+ *     $ node preserveorder.js
  */
 
 // Q. Given an array of arrays of strings can we merge the strings into
@@ -17,7 +18,7 @@
 
 // Examples
 // [['a', 'b'], ['b', 'c']] -> ['a', 'b', 'c']
-// [['1', '9'], ['1', '3'], ['3', '6']] -> ['1', '3', '6', '9']
+// [['b', 'c'], ['a', 'c'], ['a', 'b']] -> ['a', 'b', 'c']
 
 // Approach
 // - For each array, collect rules about ordering
@@ -29,7 +30,7 @@ var _ = require('lodash');
 var test = require('tape');
 
 var input1 = [['a', 'b'], ['b', 'c']];
-var input2 = [['a', 'b'], ['b', 'c'], ['a', 'c']];
+var input2 = [['b', 'c'], ['a', 'c'], ['a', 'b']];
 var input3 = [['a', 'b'], ['b', 'c'], ['b', 'd'], ['c', 'd']];
 var input4 = [['1', '9'], ['3', '6'], ['1', '3'], ['6', '9']];
 var input5 = [
@@ -143,10 +144,22 @@ test('preserveOrder input1', function (t) {
   t.deepEqual(arr, ['a', 'b', 'c']);
 });
 
-test('preserveOrder input4', function (t) {
+test('preserveOrder input2', function (t) {
   t.plan(1);
   var arr = preserveOrder(input4);
   t.deepEqual(arr, ['1', '3', '6', '9']);
+});
+
+test('preserveOrder input3', function (t) {
+  t.plan(1);
+  var arr = preserveOrder(input3);
+  t.deepEqual(arr, [ 'a', 'b', 'c', 'd' ]);
+});
+
+test('preserveOrder input4', function (t) {
+  t.plan(1);
+  var arr = preserveOrder(input4);
+  t.deepEqual(arr, [ '1', '3', '6', '9' ]);
 });
 
 test('preserveOrder input5', function (t) {
