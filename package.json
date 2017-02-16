@@ -1,0 +1,14 @@
+{
+  "name": "preserveorder.js",
+  "version": "1.0.0",
+  "description": "Merge an array of an array of strings while preserving element order",
+  "main": "preserveorder.js",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "tape": "^4.6.3"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "author": "Ben Ma",
+  "license": "MIT"
+}
