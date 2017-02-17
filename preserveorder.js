@@ -30,7 +30,14 @@ var _ = require('lodash');
 var test = require('tape');
 
 var input1 = [['a', 'b'], ['b', 'c']];
-var input2 = [['b', 'c'], ['a', 'c'], ['a', 'b']];
+
+var input2_a = [['b', 'c'], ['a', 'c'], ['a', 'b']];
+var input2_b = [['b', 'c'], ['a', 'b'], ['a', 'c']];
+var input2_c = [['a', 'b'], ['a', 'c'], ['b', 'c']];
+var input2_d = [['a', 'b'], ['b', 'c'], ['a', 'c']];
+var input2_e = [['a', 'c'], ['a', 'b'], ['b', 'c']];
+var input2_f = [['a', 'c'], ['b', 'c'], ['a', 'b']];
+
 var input3 = [['a', 'b'], ['b', 'c'], ['b', 'd'], ['c', 'd']];
 var input4 = [['1', '9'], ['3', '6'], ['1', '3'], ['6', '9']];
 var input5 = [
@@ -40,6 +47,12 @@ var input5 = [
   ['a', 'b', 'c', 'd',      'f', 'g'],
   ['a', 'b', 'c', 'd', 'e',      'g'],
 ];
+
+var input6 = [['a', 'b'], ['b', 'c'], ['c', 'd'], ['d', 'e']];
+var input7 = [['e', 'd'], ['d', 'c'], ['c', 'b'], ['b', 'a']];
+
+// Ambiguous ordering
+var input8 = [['a', 'b', 'c', 'd'], ['e', 'f', 'g', 'h'], ['i', 'j', 'k', 'l']];
 
 /**
  * Update rules table for all elements that key has higher order precedence over
@@ -103,8 +116,8 @@ var preserveOrder = function (input) {
   // Rules lookup for order precedence
   var sorted = Object.keys(uniq);
   sorted.sort(function sortByRules(a, b) {
-    if (rules[a] && rules[a][b]) return -1;
-    if (rules[b] && rules[b][a]) return 1;
+    if (rules[a] && rules[a][b]) return -1; // a < b
+    if (rules[b] && rules[b][a]) return 1;  // a > b
     return 0;
   });
   return sorted;
@@ -120,15 +133,15 @@ test('updateRules input1[0]', function (t) {
 test('updateRules input2[0..2]', function (t) {
   t.plan(1);
   var rules = {};
-  updateRules(input2[0], rules);
-  updateRules(input2[1], rules);
-  updateRules(input2[2], rules);
+  updateRules(input2_a[0], rules);
+  updateRules(input2_a[1], rules);
+  updateRules(input2_a[2], rules);
   t.deepEqual(rules, {a: {b: 1, c: 1}, b: {c: 1}});
 });
 
 test('getMasterRules input2 basic', function (t) {
   t.plan(1);
-  var rules = getMasterRules(input2);
+  var rules = getMasterRules(input2_a);
   t.deepEqual(rules, {a: {b: 1, c: 1}, b: {c: 1}});
 });
 
@@ -144,10 +157,15 @@ test('preserveOrder input1', function (t) {
   t.deepEqual(arr, ['a', 'b', 'c']);
 });
 
-test('preserveOrder input2', function (t) {
-  t.plan(1);
-  var arr = preserveOrder(input4);
-  t.deepEqual(arr, ['1', '3', '6', '9']);
+test('preserveOrder input2 permutations', function (t) {
+  t.plan(6);
+  var arr = ['a', 'b', 'c'];
+  t.deepEqual(preserveOrder(input2_a), arr);
+  t.deepEqual(preserveOrder(input2_b), arr);
+  t.deepEqual(preserveOrder(input2_c), arr);
+  t.deepEqual(preserveOrder(input2_d), arr);
+  t.deepEqual(preserveOrder(input2_e), arr);
+  t.deepEqual(preserveOrder(input2_f), arr);
 });
 
 test('preserveOrder input3', function (t) {
@@ -167,3 +185,20 @@ test('preserveOrder input5', function (t) {
   var arr = preserveOrder(input5);
   t.deepEqual(arr, ['a', 'b', 'c', 'd', 'e', 'f', 'g']);
 });
+
+test('preserveOrder input6', function (t) {
+  t.plan(1);
+  var arr = preserveOrder(input6);
+  t.deepEqual(arr, ['a', 'b', 'c', 'd', 'e']);
+});
+
+test('preserveOrder input7', function (t) {
+  t.plan(1);
+  var arr = preserveOrder(input7);
+  t.deepEqual(arr, ['e', 'd', 'c', 'b', 'a']);
+});
+
+// NOTE: Output of ambiguous input results in a "weaved" array
+var arr = preserveOrder(input8);
+console.log('preserveOrder: ' + JSON.stringify(input8));
+console.log(' => ' + JSON.stringify(arr));
